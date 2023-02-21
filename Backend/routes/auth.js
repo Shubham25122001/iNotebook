@@ -2,6 +2,10 @@ const express = require('express');
 const User = require('../models/User');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
+var jwt = require('jsonwebtoken');
+
+const JWT_SECRET = 'Shubhmisadeveloperdb$oy';
 
 // Create a User using: POST "/api/auth/createuser". No login required 
 router.post('/createuser', [
@@ -14,19 +18,32 @@ router.post('/createuser', [
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    // check whether the user with this email exists already 
     try{
+      // check whether the user with this email exists already 
     let user = await User.findOne({email: req.body.email});
     if(user){
       return res.status(400).json({error: "Sorry a user with this email already exists"});
     }
-    // Create a new user
+     
+    // Adding salt with passsword and convert to hash 
+    const salt = await bcrypt.genSalt(10);
+    secPass = await bcrypt.hash(req.body.password, salt);
+
+    // Create a new user                   
     user = await User.create({
         name: req.body.name,
-        password: req.body.password,
+        password: secPass,
         email: req.body.email
-      })
-      res.json(user);
+      });
+      const Data = {
+        user:{
+          id: user.id
+        }
+      }
+    const authToken = jwt.sign(Data, JWT_SECRET);
+    
+      res.json(authToken);
+
     }catch (error){
       console.log(error.message);
      res.status(500).send("Some Error occured");
