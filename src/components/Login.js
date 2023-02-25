@@ -19,8 +19,8 @@ let history  = useNavigate();
         if(json.success){
            // Save the auth token and redirect
            localStorage.setItem('token', json.authtoken);
-           history('/');
            props.showAlert("Logged in Successfully", "success")
+           history('/');
         }
         else{
            props.showAlert("Invalid Details", "danger")
@@ -30,7 +30,8 @@ let history  = useNavigate();
         setCredential({...credential, [e.target.name]: e.target.value})
     }
     return (
-        <div>
+        <div className='mt-3'>
+            <h2>Login to continue to iNotebook</h2>
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label htmlFor="email" className="form-label">Email address</label>
